@@ -1,46 +1,59 @@
-import { useState } from "react";
-const UseForm = ({step,formDetails,formData,setFormData})=>{
-    const currentStepDetails = formDetails.filter((item)=>item[0]===step);
-    console.log(currentStepDetails)
-    const handleChange = (e)=>{
-        setFormData(prev=>(
-            {
-                ...prev,
-                [name]:e.target.value
-            }
-        ))
+const UseForm = ({ step, formDetails, formData, setFormData }) => {
+    const currentStepDetails = formDetails.find((item) => item[0] === step);
+    const fields = currentStepDetails ? currentStepDetails.slice(1) : [];
 
-    }
-    return(
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: type === "checkbox" ? checked : value
+        }));
+    };
+
+    return (
         <>
-        {currentStepDetails.map((step)=>{
-                console.log(step)
-                if(step.type === "select"){
-                    return(
-                    <select name={step.name} value={formData[step.name]} onChange={handleChange} key={step[0]}>
-                        <option value=""></option>
-                        <option>Developer</option>
-                        <option>Designer</option>
-                        <option>Manager</option>
-                    </select>
-                    )
-                }else{
-                    return(
-                    <>
-                    <div key={step[0]}>
-                      <label htmlFor={step.name}>{step.label}</label>
-                      <input type={step.type} name={step.name} onChange={handleChange} value={formData[step.name]}/>
-                    </div>
-                    </>
-                    )
+            {fields.map((field) => {
+                if (field.type === "select") {
+                    return (
+                        <div key={field.name}>
+                            <label htmlFor={field.name}>{field.label}</label>
+                            <select
+                                name={field.name}
+                                value={formData[field.name] || ""}
+                                onChange={handleChange}
+                            >
+                                <option value=""></option>
+                                <option>Developer</option>
+                                <option>Designer</option>
+                                <option>Manager</option>
+                            </select>
+                        </div>
+                    );
+                } else {
+                    return (
+                        <div key={field.name}>
+                            <label htmlFor={field.name}>{field.label}</label>
+                            <input
+                                type={field.type}
+                                name={field.name}
+                                onChange={handleChange}
+                                value={
+                                    field.type === "checkbox"
+                                        ? undefined
+                                        : formData[field.name] || ""
+                                }
+                                checked={
+                                    field.type === "checkbox"
+                                        ? formData[field.name] || false
+                                        : undefined
+                                }
+                            />
+                        </div>
+                    );
                 }
             })}
-            
         </>
-            
+    );
+};
 
-    )
-
-
-}
-export default UseForm
+export default UseForm;
